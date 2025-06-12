@@ -1,0 +1,66 @@
+---
+- hosts: all
+  become: true
+  vars:
+    ubuntu_nonsense:
+      - unattended-upgrades.service
+      - apt-daily-upgrade.timer
+      - apt-daily-upgrade.service
+      - update-notifier-download.timer
+      - update-notifier-download.service
+      - apt-daily.timer
+      - apt-daily.service
+      
+  tasks:
+
+    - name: Disable password authentication access over SSH
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        state: present
+        regexp: '^#?PasswordAuthentication'
+        line: 'PasswordAuthentication no'
+
+    - name: Disable root access over SSH 
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        state: present
+        regexp: '^#?PermitRootLogin'
+        line: 'PermitRootLogin no'
+
+    - name: Update apt and install required system packages
+      apt:
+        pkg:
+          - curl
+          - vim
+          - git
+          - ufw
+          - fio
+          - nvme-cli
+          - nload
+          - net-tools
+          - plocate
+        state: latest
+        update_cache: true
+
+    - name: tweak needrestart system behavior
+      shell: sed -i "s/#\$nrconf{kernelhints} = -1;/\$nrconf{kernelhints} = -1;/g" /etc/needrestart/needrestart.conf
+      when: ansible_distribution == 'Ubuntu' and ansible_distribution_version != '20.04'
+
+    - name: Setup passwordless sudo
+      lineinfile:
+        path: /etc/sudoers
+        state: present
+        regexp: '^%sudo'
+        line: '%sudo ALL=(ALL) NOPASSWD: ALL'
+        validate: '/usr/sbin/visudo -cf %s'
+
+    - name: Disable ubuntu servuces
+      become: true
+      ansible.builtin.systemd_service:
+        name: "{{ item }}"
+        enabled: false
+        state: stopped
+        masked: true
+      with_items: "{{ ubuntu_nonsense }}"
+      ignore_errors: true
+      when: ansible_distribution == 'Ubuntu' and ansible_distribution_version != '20.04'

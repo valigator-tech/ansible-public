@@ -1,0 +1,27 @@
+---
+- hosts: all
+  become: true
+
+  tasks:
+    - name: Install fail2ban package
+      package:
+        name: fail2ban
+        state: present
+
+    - name: Create Fail2Ban invalid user config file
+      copy:
+        src: "{{pwd}}/content/sshd-invaliduser.conf.filter"
+        dest: /etc/fail2ban/filter.d/sshd-invaliduser.conf
+        remote_src: false 
+
+    - name: Create Fail2Ban invalid user jail
+      copy:
+        src: "{{pwd}}/content/sshd-invaliduser.conf.jail"
+        dest: /etc/fail2ban/jail.d/sshd-invaliduser.conf
+        remote_src: false 
+
+
+    - name: Restart Fail2Ban service 
+      service:
+        name: fail2ban
+        state: restarted

@@ -1,0 +1,24 @@
+
+https://docs.anza.xyz/cli/install
+
+apt-get install \
+    build-essential \
+    pkg-config \
+    libudev-dev llvm libclang-dev \
+    protobuf-compiler
+
+https://github.com/anza-xyz/agave/archive/refs/tags/v2.2.15.tar.gz
+
+
+export TAG=v2.2.15
+
+git clone https://github.com/anza-xyz/agave.git --recurse-submodules
+cd agave
+git checkout tags/$TAG
+git submodule update --init --recursive
+
+CI_COMMIT=$(git rev-parse HEAD) scripts/cargo-install-all.sh --validator-only ~/.local/share/solana/install/releases/"$TAG"
+
+export PATH="/home/sol/.local/share/solana/install/releases"/bin:"$PATH"
+
+

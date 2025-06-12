@@ -1,0 +1,29 @@
+---
+- hosts: all
+  become: true
+  vars:
+    my_users:
+      - name: jgray
+      # - name: add-more-users-here
+
+
+  tasks:
+
+    - name: Create a new regular user with sudo privileges
+      user:
+        name: "{{item.name}}"
+        state: present
+        groups: sudo
+        append: true
+        create_home: true
+        shell: /bin/bash
+      with_items:
+        - "{{ my_users }}"
+
+    - name: remove user passwords
+      user:
+        name: "{{item.name}}"
+        password: "*"        
+      with_items:
+        - "{{ my_users }}"
+

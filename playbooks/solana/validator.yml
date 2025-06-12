@@ -1,0 +1,98 @@
+
+---
+- hosts: all
+  become: true
+  
+
+  tasks:
+
+  # - name: download solana-installer
+  #   get_url:
+  #     url: "https://release.anza.xyz/{{ solana_installer_version }}/install"
+  #     dest: /home/sol/bin/solana-install-init.sh
+  #     mode: 0755
+  #     owner: "{{ solana_service_user }}"
+  #     group: "{{ solana_service_user }}"
+  #     #checksum: "{{ solana_checksums[solana_installer_version] }}"
+
+  # - name: install solana
+  #   command: "/bin/sh /home/sol/bin/solana-install-init.sh"
+  #   args:
+  #     chdir: /home/{{ solana_service_user }}/
+  #   #become: true
+  #   become_user: "{{ solana_service_user }}"
+  #   register: install_output
+  #   changed_when: false
+
+  # - name: debug
+  #   debug: var=install_output
+
+
+
+
+  # - name: Create Junk Validator Keypair
+  #   shell: 
+  #     "/home/sol/.local/share/solana/install/active_release/bin/solana-keygen new -s --no-bip39-passphrase -o /home/sol/keys/junk/validator-keypair.json"
+  #   register: validator_keypair_out
+  #   ignore_errors: yes
+
+  # - debug:
+  #     msg: "{{validator_keypair_out.stdout_lines}}"
+
+  # - name: Create Junk Vote Account Keypair
+  #   shell:
+  #     "/home/sol/.local/share/solana/install/active_release/bin/solana-keygen new -s --no-bip39-passphrase -o /home/sol/keys/junk/vote-account-keypair.json"
+  #   register: vote_keypair_out
+  #   ignore_errors: yes
+
+  # - debug:
+  #     msg: "{{vote_keypair_out.stdout_lines}}"
+
+  # - name: Create symlink for Junk Validator Keypair
+  #   shell:
+  #     "ln -sf /home/sol/keys/junk/validator-keypair.json /home/sol/validator-keypair.json"
+  #   register: validator_keypair_out
+
+  # - debug:
+  #     msg: "{{validator_keypair_out.stdout_lines}}"
+
+  # - name: Create symlink for Junk Vote Account Keypair
+  #   shell:
+  #     "ln -sf /home/sol/keys/val-mainnet-a/vote-account-keypair.json /home/sol/vote-account-keypair.json"
+  #   register: vote_keypair_out
+
+  # - debug:
+  #     msg: "{{vote_keypair_out.stdout_lines}}"
+
+  # - name: Sync sol keypairs files
+  #   ansible.posix.synchronize:
+  #     src:  '{{pwd}}/content/sol_keypairs/'
+  #     dest: /home/sol/keys/
+
+  - name: Create service for agave/solana validator client
+    template: src={{pwd}}/content/agave-validator.service dest=/etc/systemd/system/sol.service
+
+
+# SET ALL PERMISSIONS
+  - name: Set ownership on `sol` dirs
+    ansible.builtin.file:
+      path: "{{ item }}"
+      state: directory
+      recurse: yes
+      owner: sol
+      group: sol
+    with_items:
+      - "/home/sol/bin"
+      - "/home/sol/keys"
+      - "/home/sol/.ssh"
+
+  - name: Set permissions on `sol` dirs
+    ansible.builtin.file:
+      path: "{{ item }}"
+      state: directory
+      recurse: yes
+      mode: '0700'
+    with_items:
+      - "/home/sol/bin"
+      - "/home/sol/keys"
+      - "/home/sol/.ssh"

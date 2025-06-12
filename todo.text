@@ -1,0 +1,80 @@
+
+
+
+
+
+TO DO:
+
+- [ playbooks/solana/validator-user.yml ] currently SSH keys for sol user sit on disk, this needs to be moved to a secure store and ansible should pull from there. this 
+
+- Monitoring agent: site24x7 should be added into the playbooks. securely handle API key
+
+- Monitoring agent: datadog should be installed by ansible (not written yet).  securely handle API key
+
+- Installation of agave validator client is commented out in playbooks/solana/validator.yml.   This is because Anza is going away from providing pre-compiled binaries.  Work should be done to automate the building of the client.
+
+
+
+
+
+POST ANSIBLE TASKS (playbooks should be made for these)
+
+- Disable swap
+    `swapoff -a`
+
+- Remove swap from /etc/fstab
+    /swapfile swap swap defaults 0 0
+
+- Partition and Format NVME drives.
+    Suggested to use xfs
+
+- Mount at /mnt/accounts and /mnt/ledger
+example:
+/dev/nvme0n1p1  /mnt/accounts   xfs     defaults,noatime        0       2
+/dev/nvme1n1p1  /mnt/ledger     xfs     defaults,noatime        0       2
+
+- Create `/home/sol/validator.sh`
+
+- Make pubkey symlinks
+
+- Configure NTP (network time)
+    
+    timedatectl set-ntp yes
+
+    cat /etc/systemd/timesyncd.conf.d/*
+    rm -f /etc/systemd/timesyncd.conf.d/*
+    vi /etc/systemd/timesyncd.conf
+
+    NTP=ntp.ubuntu.com
+
+    systemctl restart systemd-timesyncd
+
+    timedatectl status
+
+    journalctl -u systemd-timesyncd.service -b0
+
+
+    timedatectl timesync-status
+
+
+- Install Agave (or Agave-Jito)
+
+- Final permission verification
+chown -R sol:sol /mnt/ledger
+chown -R sol:sol /mnt/accounts
+chmod -R 700 /mnt/ledger
+chmod -R 700 /mnt/accounts
+
+
+
+- Start the service 
+systemctl enable sol
+systemctl start sol
+
+- Install and run Health Check
+as root:
+mkdir /root/git/
+cd /root/git/
+git clone https://github.com/valigator-tech/ValigatorHealthCheck.git
+cd ValigatorHealthCheck
+./health_check.sh 

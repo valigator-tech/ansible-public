@@ -1,0 +1,18 @@
+---
+- hosts: all
+  become: true
+
+  tasks:
+    - name: Configure solana validator log rotation - /etc/logrotate.d/sol
+      blockinfile: 
+        state: present
+        create: true
+        insertafter: EOF
+        dest: /etc/logrotate.d/sol
+        block: |
+          /var/log/solana/solana-validator.log {
+            rotate 7
+            daily
+            missingok
+            copytruncate
+          }

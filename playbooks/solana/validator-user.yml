@@ -1,0 +1,82 @@
+---
+- hosts: all
+  become: true
+  vars:
+    my_users:
+      - name: sol
+
+
+  tasks:
+
+    - name: Create sol user
+      user:
+        name: "{{item.name}}"
+        state: present
+        #append: true
+        create_home: true
+        shell: /bin/bash
+      with_items:
+        - "{{ my_users }}"
+
+    - name: remove user passwords
+      user:
+        name: "{{item.name}}"
+        password: "*"        
+      with_items:
+        - "{{ my_users }}"
+
+    - name: Create directories if they do not exist
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        mode: '0700'
+      with_items:
+            - "/home/sol"
+            - "/home/sol/.ssh"
+            - "/home/sol/bin"
+            - "/var/log/solana"
+            - "/mnt/ledger"
+            - "/mnt/accounts"
+            - "/mnt/snapshots"
+      ignore_errors: yes
+
+    - name: Set ownership on `sol` user dirs
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        recurse: yes
+        owner: sol
+        group: sol
+      with_items:
+        - "/home/sol"
+        - "/home/sol/.ssh"
+        - "/home/sol/bin"
+        - "/var/log/solana"
+        - "/mnt/ledger"
+        - "/mnt/accounts"
+        - "/mnt/snapshots"
+      ignore_errors: yes
+    
+    # COMMENTING OUT FOR NOW
+    #   
+    # - name: Sync .ssh files
+    #   ansible.posix.synchronize:
+    #     src:  '{{pwd}}/content/sshkeys_sol/'
+    #     dest: /home/sol/.ssh/
+
+
+    # COMMENTING OUT FOR NOW
+    #   
+    # - name: Set authorized key for remote user
+    #   ansible.posix.authorized_key:
+    #     user: "sol"
+    #     state: present
+    #     key: "{{ lookup('file', '{{pwd}}/content/sshkeys_sol/id_ed25519.pub') }}"
+
+
+    - name: Create sub-directories if they do not exist
+      ansible.builtin.file:
+        path: "/home/sol/keys/junk"
+        state: directory
+        mode: '0700'
+

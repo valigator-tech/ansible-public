@@ -1,0 +1,16 @@
+---
+- hosts: all
+  become: true
+  vars:
+    my_users:
+      - name: jgray
+
+  tasks:
+
+    - name: Set authorized key for remote user
+      ansible.posix.authorized_key:
+        user: "{{item.name}}"
+        state: present
+        key: "{{ lookup('file', '{{pwd}}/content/sshkeys_users/{{item.name}}') }}"
+      with_items:
+        - "{{ my_users }}"

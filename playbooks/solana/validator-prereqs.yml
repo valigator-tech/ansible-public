@@ -1,0 +1,64 @@
+---
+- hosts: all
+  become: true
+
+  tasks:
+
+  - name: Install aptitude
+    apt:
+      name: aptitude
+      state: latest
+      update_cache: true
+
+  - name: minimum dependencies
+    apt:
+      pkg: ['cpufrequtils', 'sysstat', 'smartmontools']
+      state: latest
+      update_cache: true
+
+  - name: install dependencies 
+    apt:
+      pkg: ['llvm', 'clang', 'make', 'git', 'acl', 'zlib1g-dev', 'pkg-config', 'libudev-dev', 'libssl-dev']
+      state: latest
+      update_cache: true
+
+  - name: install linux kernel tools 3
+    apt:
+      pkg: ["linux-tools-generic", "linux-tools-{{ ansible_kernel }}", "inotify-tools", "htop", "iotop", "powertop", "cpufrequtils"]
+      state: present
+      state: latest
+      update_cache: true
+
+  - name: ensure cpu governor is set
+    copy:
+      content: "GOVERNOR=\"{{ cpu_governor }}\""
+      dest: /etc/default/cpufrequtils
+      owner: root
+      group: root
+      mode: 0644
+    ignore_errors: true
+    when: cpu_governor != "bios"
+
+  - name: Create sysctl tweak file
+    copy:
+      src: "{{pwd}}/content/99-agave-validator.conf"
+      dest: /etc/sysctl.d/99-agave-validator.conf
+      remote_src: false 
+
+  - name: Apply sysctl changes
+    shell: sudo sysctl -p /etc/sysctl.d/99-agave-validator.conf
+
+  - name: Increase open file limit - /etc/systemd/system.conf
+    blockinfile: 
+      state: present
+      insertafter: EOF
+      dest: /etc/systemd/system.conf
+      content: |
+        DefaultLimitNOFILE=1000000
+
+  - name: Increase open file limit - /etc/security/limits.d/90-solana-nofiles.conf
+    copy: 
+      dest: /etc/security/limits.d/90-solana-nofiles.conf
+      content: |
+        # Increase process file descriptor count limit
+        * - nofile 1000000

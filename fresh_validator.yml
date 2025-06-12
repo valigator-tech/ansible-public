@@ -1,0 +1,21 @@
+---
+- hosts: all
+  gather_facts: no
+  tasks:
+  - set_fact:
+      pwd: "{{playbook_dir}}"
+
+
+# basic setup
+- import_playbook: "{{playbook_dir}}/playbooks/setup/create_users.yml"
+- import_playbook: "{{playbook_dir}}/playbooks/setup/ssh_keys.yml"
+- import_playbook: "{{playbook_dir}}/playbooks/setup/configure_server_settings.yml"
+
+# solana
+- import_playbook: "{{playbook_dir}}/playbooks/solana/validator-user.yml"
+- import_playbook: "{{playbook_dir}}/playbooks/solana/validator-firewall.yml"
+- import_playbook: "{{playbook_dir}}/playbooks/solana/validator-prereqs.yml"
+- import_playbook: "{{playbook_dir}}/playbooks/solana/validator.yml"
+- import_playbook: "{{playbook_dir}}/playbooks/solana/validator-logrotate.yml"
+- import_playbook: "{{playbook_dir}}/playbooks/solana/fail2ban.yml"
+- import_playbook: "{{playbook_dir}}/playbooks/solana/validator-bashrc.yml"

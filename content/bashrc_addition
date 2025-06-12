@@ -1,0 +1,10 @@
+alias catchup='clear && solana catchup --our-localhost'
+alias monitor='clear && agave-validator --ledger /mnt/ledger monitor'
+alias logtail='tail -f /var/log/solana/solana-validator.log'
+alias logs='logtail | grep -v INFO'
+alias syncbin="rsync -av --exclude='validator.sh' /home/sol/bin/ sol@tools-01:/home/sol/validator-bin/"
+alias waitforexit='agave-validator --ledger /mnt/ledger exit --max-delinquent-stake 5 --min-idle-time 10'
+alias forceexit='agave-validator --ledger /mnt/ledger exit -f'
+alias waitforwindow='agave-validator --ledger /mnt/ledger wait-for-restart-window --max-delinquent-stake 5 --min-idle-time 10'
+alias makeactive-testnet='agave-validator -l /mnt/ledger set-identity --require-tower /home/sol/keys/val-testnet-a/validator-keypair.json'
+alias makeactive='agave-validator -l /mnt/ledger set-identity --require-tower /home/sol/keys/val-mainnet-a/validator-keypair.json'

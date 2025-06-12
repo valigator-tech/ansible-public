@@ -1,0 +1,4 @@
+ansible_ssh_common_args="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
+
+[testnet]
+my_validator ansible_host=my_validator.fqdn

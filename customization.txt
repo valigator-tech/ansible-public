@@ -1,0 +1,8 @@
+
+Places to customize for your environment:
+
+- [ playbooks/setup/create_users.yml ] Add list of local users to create in variable `my_users`
+
+- [ playbooks/setup/ssh_keys.yml ] Add list of local users to create in variable `my_users` and place their public keys on disk in in `{{pwd}}/content/sshkeys_users/{{item.name}}`
+
+- [ /playbooks/solana/validator-firewall.yml ]  Add IPs to `UFW - Allow Specific IPs over SSH` if you want to allow only public specific IPs in via the software firewall.

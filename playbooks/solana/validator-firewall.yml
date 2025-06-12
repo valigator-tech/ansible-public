@@ -1,0 +1,36 @@
+---
+- hosts: all
+  become: true
+    
+  tasks:
+
+    - name: Reset UFW
+      ufw: 
+        state: reset
+
+    # - name: UFW - Allow Specific IPs over SSH
+    #   community.general.ufw:
+    #     rule: allow
+    #     port: '22'
+    #     proto: 'tcp'
+    #     from_ip: '{{ item }}'
+    #   loop:
+    #     - x.x.x.x/32
+
+    - name: UFW - Allow wide range of dynamic ports udp & tcp
+      community.general.ufw:
+        rule: allow
+        port: '8000:8020'
+        proto: '{{ item }}'
+      loop:
+        - udp
+        - tcp
+
+    - name: UFW - Enable and deny by default
+      community.general.ufw:
+        state: enabled
+        default: deny
+
+
+
+
