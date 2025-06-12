@@ -1,2 +1,3 @@
-content/sshkeys_users/
+content/sshkeys_users/*
+!content/sshkeys_users/.gitkeep
 hosts.yml
