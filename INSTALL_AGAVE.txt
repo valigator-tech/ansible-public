@@ -7,9 +7,6 @@ apt-get install \
     libudev-dev llvm libclang-dev \
     protobuf-compiler
 
-https://github.com/anza-xyz/agave/archive/refs/tags/v2.2.15.tar.gz
-
-
 export TAG=v2.2.15
 
 git clone https://github.com/anza-xyz/agave.git --recurse-submodules
