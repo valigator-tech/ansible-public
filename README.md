@@ -24,4 +24,8 @@ echo 'ansible ALL=(ALL) NOPASSWD:ALL' | sudo tee /etc/sudoers.d/ansible > /dev/n
 
 
 # RUN:
-ansible-playbook -i hosts.yml fresh_validator.yml -l **HOSTNAME**# ansible-public
+ansible-playbook -i hosts.yml fresh_validator.yml -l **HOSTNAME**
+
+
+ansible-playbook -i hosts.yml ./playbooks/solana/validator-bashrc.yml -l val-29 -e "pwd=`pwd`"
+

@@ -20,7 +20,7 @@ sudo apt install -y libssl-dev libudev-dev pkg-config zlib1g-dev llvm clang cmak
 as SOL user:
 
 
-export TAG=v2.2.15-jito
+export TAG=v2.2.16-jito
 
 git clone https://github.com/jito-foundation/jito-solana.git --recurse-submodules
 cd jito-solana
@@ -32,3 +32,14 @@ CI_COMMIT=$(git rev-parse HEAD) scripts/cargo-install-all.sh --validator-only ~/
 put this new path line in bashrc AND validator startup script
 
 export PATH="/home/sol/.local/share/solana/install/releases/v2.1.18-jito"/bin:"$PATH"
+
+
+
+
+# IF NOT DOING THIS FOR THE FIRST TIME ON
+export TAG=v2.2.16-jito
+cd jito-solana
+git pull
+git checkout tags/$TAG
+git submodule update --init --recursive
+CI_COMMIT=$(git rev-parse HEAD) scripts/cargo-install-all.sh --validator-only ~/.local/share/solana/install/releases/"$TAG"
