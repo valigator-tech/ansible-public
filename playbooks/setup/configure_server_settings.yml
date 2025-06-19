@@ -39,6 +39,7 @@
           - nload
           - net-tools
           - plocate
+          - lm-sensors
         state: latest
         update_cache: true
 
